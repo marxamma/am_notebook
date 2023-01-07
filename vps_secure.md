@@ -9,7 +9,13 @@
 > useradd marx
 2. 为用户marx设置密码
 > passwd marx
-3. 启用防火墙
+3. 将用户marx添加到sudoers中
+   1. 使用vim打开以下文件
+   > vim /etc/sudoers
+   2. 在文件中增加以下内容
+   > marx    ALL=(ALL)       ALL  
+   3. 保存修改，提示只读文件的话，使用wq!强制保存
+4. 启用防火墙
    1. 清空原有防火墙规则
     > iptables -F  
     > iptables -X  
@@ -17,28 +23,25 @@
    2. 配置新的防火墙规则
     > iptables -A INPUT -p tcp -m multiport --dport 10086,80,21,22 -j ACCEPT #允许SSH端口10086、WEB端口80、FTP端口21、22开放
    3. 保存配置
-    > /etc/init.d/iptables save
-   4. 重启防火墙
-    > service iptables restart
-4. 更改ssh配置
+    > iptables-save
+5. 更改ssh配置
    1. 打开ssh配置文件
     > vim /etc/ssh/sshd_config
-   2. 将#Port 22修改为Port 22， 将 # 删除暂时放开22端口，避免无法使用新端口连接时，22端口也被关闭，导致再也无法登陆服务器
-   3. 增加一个新端口
+   2. 增加一个新端口
     > Port 10086 #ssh端口尽量设置大一点
-   4. 重启ssh服务
+   3. 重启ssh服务
     > service sshd restart
-   5. 使用新端口登陆，如果能够正常登陆，则进入下一步，否则关闭防火墙
-   6. 重新打开ssh配置文件
+   4. 使用新端口登陆，如果能够正常登陆，则进入下一步，否则关闭防火墙
+   5. 重新打开ssh配置文件
     > vim /etc/ssh/sshd_config
-   7. 重新将Port 22禁用
-   8. 修改以下配置
+   6. 修改以下配置
     > PermitRootLogin no #禁止root登录  
     > X11Forwarding no #禁止X11转发  
     > PermitEmptyPasswords no #禁止空密码登录  
     > AllowUsers marx #用户marx可以登录  
-   9. 重启ssh服务
+   7. 重启ssh服务
     > service sshd restart
+   8. 使用marx用户和10086端口尝试登陆
 
 # 安装宝塔免费防火墙
 1. 注册宝塔账户
